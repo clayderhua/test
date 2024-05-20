@@ -6,6 +6,7 @@ To simplify development and deployment to our customers, Advantech provides the 
 
 https://ess-wiki.advantech.com.tw/view/RISC
 
+![nxp](https://github.com/clayderhua/test/blob/main/nxp.png)
 
 |  NXP i.mx                   |  Repository                                                                    |
 |:----------------------------|:-------------------------------------------------------------------------------|
