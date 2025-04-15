@@ -1,4 +1,157 @@
 AIM-Linux Developer Center
+
+
+# Introduction
+
+How to compile Yocto 5.1 on the new Advantech NXP BSP?
+
+Based on NXP Yocto 5.1-6.12.3 version + Advantech Meta Layer
+
+## Step 1: Initialize Yocto Environment
+
+```bash
+$ git config --global user.name "Your Name"
+$ git config --global user.email "Your Email"
+$ git config --list
+
+$ mkdir imx-yocto-bsp
+$ cd imx-yocto-bsp
+$ repo init -u https://github.com/nxp-imx/imx-manifest -b imx-linux-styhead -m imx-6.12.3-1.0.0.xml
+$ repo sync
+```
+
+Check sources folders:
+
+```
+sources/
+├── base
+├── meta-arm
+├── meta-browser
+├── meta-clang
+├── meta-freescale
+├── meta-freescale-3rdparty
+├── meta-freescale-distro
+├── meta-imx
+├── meta-nxp-connectivity
+├── meta-nxp-demo-experience
+├── meta-openembedded
+├── meta-qt6
+├── meta-security
+├── meta-timesys
+├── meta-virtualization
+└── poky
+```
+
+## Step 2: Get Advantech Meta Layer
+
+```bash
+$ cd sources
+$ git clone https://AIM-Linux@dev.azure.com/AIM-Linux/meta-advantech-nxp/_git/meta-advantech-nxp -b styhead-6.12.3-next
+$ mv meta-advantech-nxp meta-advantech
+```
+
+Updated sources folder:
+
+```
+sources/
+├── base
+├── meta-advantech
+├── meta-arm
+├── meta-browser
+├── meta-clang
+├── meta-freescale
+├── meta-freescale-3rdparty
+├── meta-freescale-distro
+├── meta-imx
+├── meta-nxp-connectivity
+├── meta-nxp-demo-experience
+├── meta-openembedded
+├── meta-qt6
+├── meta-security
+├── meta-timesys
+├── meta-virtualization
+└── poky
+```
+
+## Step 3: Compile Yocto
+
+Example for XWayland and imx8mprsb3720a2 board:
+
+```bash
+$ MACHINE=imx8mprsb3720a2 DISTRO=fsl-imx-xwayland source ./imx-setup-release.sh -b rsb3720
+```
+
+### Enabling the Advantech BSP Layer
+
+To enable the layer, add the following line to the end of `conf/bblayers.conf`:
+
+```bash
+BBLAYERS += "${BSPDIR}/sources/meta-advantech"
+```
+
+Then start the build:
+
+```bash
+$ bitbake imx-image-core
+```
+
+---
+
+## The Advantech Meta Layer Tree Structure
+
+```
+meta-advantech/
+├── conf
+│   ├── layer.conf
+│   └── machine
+│       └── imx8mprsb3720a2.conf
+├── recipes-bsp
+│   └── u-boot
+│       ├── u-boot-imx
+│       │   ├── board
+│       │   │   ├── 0001-change-debug-port-uart3.patch
+│       │   │   ├── 0001-support_eth0_eth1_MAC_address_from_spi.patch
+│       │   │   ├── change_debug_port_uart3.inc
+│       │   │   └── support_ethernet_MAC_address.inc
+│       │   ├── drivers
+│       │   │   └── spi
+│       │   │       ├── 0001-spi_controller_not_support_advanced_features.patch
+│       │   │       └── spi_controller_not_support_advanced_features.inc
+│       │   └── imx8mprsb3720a2
+│       │       ├── imx8mp-rsb3720-a2.dts
+│       │       ├── imx8mprsb3720a2.inc
+│       │       ├── imx8mp-rsb3720-a2-u-boot.dtsi
+│       │       └── lpddr4_timing_rsb3720a2_6G.c
+│       └── u-boot-imx_2024.04.bbappend
+├── recipes-kernel
+│   └── linux
+│       ├── linux-imx
+│       │   ├── drivers
+│       │   │   ├── 0001-ewm-c109f601e_3g_module.patch
+│       │   │   ├── ewm-c109f601e_3g_module.inc
+│       │   │   ├── watchdog_advantech.c
+│       │   │   └── watchdog_advantech.inc
+│       │   ├── imx8mprsb3720a2
+│       │   │   ├── imx8mp-rsb3720-a2.dts
+│       │   │   ├── imx8mprsb3720a2.inc
+│       │   │   └── rtc-support.cfg
+│       │   ├── rom2620-ed91
+│       │   │   ├── lt9211-driver-fixup.patch
+│       │   │   ├── lvds-support.cfg
+│       │   │   ├── rom2620-ed91.dts
+│       │   │   └── rom2620-ed91.inc
+│       │   ├── rom2820-ed93
+│       │   │   ├── rom2820-ed93.dts
+│       │   │   └── rom2820-ed93.inc
+│       │   └── rom5722-db2510
+│       │       ├── rom5722-db2510.dts
+│       │       ├── rom5722-db2510.inc
+│       │       └── rtc-support.cfg
+│       └── linux-imx_6.%.bbappend
+```
+
+
+
 ## RSB-3720 測試狀態表  
 ✅ pass ｜ ❌ fail ｜ ⚠️ Not Tested
 
